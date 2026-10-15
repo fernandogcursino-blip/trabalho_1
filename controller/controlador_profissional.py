@@ -30,8 +30,44 @@ class ControladorProfissional:
         self._profissionais.append(novo_profissional)
         self._tela_profissional.mostra_mensagem("Profissional cadastrado com sucesso!")
         
-    # Implemente altera_profissional e exclui_profissional seguindo a lógica do Paciente
-    
+    def altera_profissional(self):
+        """Altera os dados de um profissional existente."""
+        cpf_antigo = self._tela_profissional.pega_cpf("CPF do profissional a alterar: ")
+        if not cpf_antigo:
+            return
+            
+        if not self.__profissional_existe(cpf_antigo):
+            self._tela_profissional.mostra_mensagem("Profissional não encontrado.")
+            return
+            
+        novos_dados = self._tela_profissional.pega_dados_profissional()
+        if not novos_dados:
+            return
+            
+        for i, profissional in enumerate(self._profissionais):
+            if profissional.cpf == cpf_antigo:
+                # Cria um novo objeto para substituir o antigo, evitando o aviso amarelo de acesso a atributos protegidos
+                profissional_atualizado = Profissional(
+                    novos_dados['nome'], novos_dados['celular'], novos_dados['cpf'], 
+                    novos_dados['especialidade'], novos_dados['registro_profissional']
+                )
+                self._profissionais[i] = profissional_atualizado
+                self._tela_profissional.mostra_mensagem("Dados do profissional alterados com sucesso!")
+                break
+        
+    def exclui_profissional(self):
+        """Exclui um profissional pelo CPF."""
+        cpf = self._tela_profissional.pega_cpf("CPF do profissional a excluir: ")
+        if not cpf:
+            return
+            
+        for i, profissional in enumerate(self._profissionais):
+            if profissional.cpf == cpf:
+                del self._profissionais[i]
+                self._tela_profissional.mostra_mensagem(f"Profissional com CPF {cpf} excluído com sucesso!")
+                return # O return aqui é essencial para parar o ciclo após excluir
+        self._tela_profissional.mostra_mensagem("Profissional não encontrado.")
+
     def lista_profissionais(self):
         if not self._profissionais:
             self._tela_profissional.mostra_mensagem("Nenhum profissional cadastrado.")
@@ -45,8 +81,8 @@ class ControladorProfissional:
         switcher = {
             0: self.retornar,
             1: self.inclui_profissional,
-            # 2: self.altera_profissional,
-            # 3: self.exclui_profissional,
+            2: self.altera_profissional,
+            3: self.exclui_profissional,
             4: self.lista_profissionais
         }
         while True:

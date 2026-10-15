@@ -41,6 +41,8 @@ class ControladorClinica:
         switcher = {
             0: self.retornar,
             1: self.inclui_clinica,
+            2: self.altera_clinica,
+            3: self.exclui_clinica,
             4: self.lista_clinicas
         }
         while True:
