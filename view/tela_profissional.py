@@ -38,7 +38,6 @@ class TelaProfissional:
 
         print("\n--- SELECIONE A CLÍNICA DO PROFISSIONAL ---")
         for i, c in enumerate(clinicas_disponiveis):
-            # Acessa os atributos usando as propriedades da classe Clinica
             print(f"[{i}] {c.nome} (CNPJ: {c.cnpj})")
             
         opcoes_validas = list(range(len(clinicas_disponiveis)))
@@ -60,7 +59,6 @@ class TelaProfissional:
     def mostra_profissionais(self, profissionais):
         print("\n--- LISTA DE PROFISSIONAIS ---")
         for p in profissionais:
-            # Mostra também o nome da clínica vinculada
             print(f"Nome: {p.nome} | CPF: {p.cpf} | Esp: {p.especialidade} | Clínica: {p.clinica.nome}")
             
     def mostra_mensagem(self, mensagem):

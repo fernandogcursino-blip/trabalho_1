@@ -13,7 +13,6 @@ class Atendimento:
         self._procedimentos = []
         self._pagamentos = [] 
 
-        # AGORA ENVIAMOS A DATA DA CONSULTA PARA CALCULAR A IDADE CORRETA:
         self._paciente.validar_independencia(self._data)
 
         clinica = self._profissional.clinica

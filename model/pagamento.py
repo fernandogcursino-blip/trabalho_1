@@ -54,6 +54,5 @@ class PagamentoCartao(Pagamento):
     def bandeira(self): return self._bandeira
 
     def detalhe(self):
-        # Exibe a bandeira e apenas os últimos 4 dígitos do cartão
         final_cartao = self._numero_cartao[-4:] if len(self._numero_cartao) >= 4 else self._numero_cartao
         return f"Cartão {self._bandeira} (Final {final_cartao})"

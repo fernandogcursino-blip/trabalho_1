@@ -37,11 +37,9 @@ class TelaRelatorios:
             print("Nenhum dado para exibir.")
             return
             
-        # O mais caro é o primeiro da lista (posição 0)
         mais_caro, valor_caro = atendimentos_ordenados[0]
         print(f"[MAIS CARO] -> Código: {mais_caro.codigo} | Valor Total: R$ {valor_caro:.2f} | Paciente: {mais_caro.paciente.nome}")
         
-        # O mais barato é o último da lista (posição -1)
         mais_barato, valor_barato = atendimentos_ordenados[-1]
         print(f"[MAIS BARATO] -> Código: {mais_barato.codigo} | Valor Total: R$ {valor_barato:.2f} | Paciente: {mais_barato.paciente.nome}")
         

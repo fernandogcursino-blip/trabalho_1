@@ -24,7 +24,7 @@ class TelaAtendimento:
         print("0 - Retornar")
         return self.le_num_inteiro("Escolha a opção: ", [0, 1, 2, 3, 4, 5, 6])
 
-    # AGORA RECEBE A LISTA DE TIPOS CADASTRADOS NO SISTEMA
+
     def pega_dados_atendimento(self, pacientes, profissionais, tipos):
         print("\n--- DADOS DO ATENDIMENTO ---")
         codigo = self.le_num_inteiro("Código do Atendimento (número): ")
@@ -106,7 +106,7 @@ class TelaAtendimento:
             data = a.data if hasattr(a, 'data') else 'N/A'
             status = a.status_pagamento if hasattr(a, 'status_pagamento') else 'Pendente'
             
-            # AGORA EXTRAI O NOME DO OBJETO TIPO_ATENDIMENTO
+
             obj_tipo = a.tipo_atendimento if hasattr(a, 'tipo_atendimento') else None
             nome_tipo = obj_tipo.nome if hasattr(obj_tipo, 'nome') else obj_tipo
             

@@ -43,7 +43,7 @@ class TelaPaciente:
     def mostra_pacientes(self, pacientes):
         print("\n--- LISTA DE PACIENTES ---")
         for p in pacientes:
-            # Como blindamos o Model, podemos acessar os atributos diretamente!
+            
             print(f"Nome: {p.nome} | CPF: {p.cpf} | Nasc: {p.data_nascimento} | Tel: {p.telefone}")
             
     def mostra_mensagem(self, mensagem):

@@ -73,7 +73,6 @@ class ControladorClinica:
             return
         self._tela_clinica.mostra_clinicas(self._clinicas)
 
-    # CORREÇÃO CRÍTICA DO LOOP AQUI:
     def retornar(self):
         return
     

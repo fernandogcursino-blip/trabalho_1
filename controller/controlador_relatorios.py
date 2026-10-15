@@ -36,13 +36,11 @@ class ControladorRelatorios:
         
         lista_valores = []
         for a in atendimentos:
-            # O valor total é a soma do valor base da consulta + os procedimentos realizados nela
             valor_total = a.valor_base
             for p in a.procedimentos:
                 valor_total += p.valor
             lista_valores.append((a, valor_total))
         
-        # Ordena a lista de tuplas de forma decrescente com base no valor (índice 1 da tupla)
         atendimentos_ordenados = sorted(lista_valores, key=lambda item: item[1], reverse=True)
         self._tela_relatorios.mostra_relatorio_atendimentos_valores(atendimentos_ordenados)
 
@@ -69,7 +67,6 @@ class ControladorRelatorios:
         atendimentos = self._controlador_sistema._controlador_atendimento.atendimentos
         valores_procedimentos = {}
         
-        # Extrai os nomes únicos e os respetivos valores
         for a in atendimentos:
             for p in a.procedimentos:
                 nome_proc = p.nome

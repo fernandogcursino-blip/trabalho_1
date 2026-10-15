@@ -80,7 +80,6 @@ class ControladorProfissional:
             return
         self._tela_profissional.mostra_profissionais(self._profissionais)
 
-    # CORREÇÃO CRÍTICA DO LOOP AQUI:
     def retornar(self):
         return
     

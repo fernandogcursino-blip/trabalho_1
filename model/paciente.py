@@ -30,7 +30,6 @@ class Paciente(Pessoa):
     def telefone(self): return self._telefone
 
     def is_maior_de_idade(self, data_referencia=None):
-        # Se receber a data da consulta, usa-a. Caso contrário, usa a data de hoje.
         if data_referencia is None:
             referencia = datetime.now()
         elif isinstance(data_referencia, str):
@@ -49,7 +48,6 @@ class Paciente(Pessoa):
         else:
             data_nasc = self._data_nascimento
             
-        # Calcula a idade exata no dia do atendimento
         idade = referencia.year - data_nasc.year - ((referencia.month, referencia.day) < (data_nasc.month, data_nasc.day))
         return idade >= 18
 

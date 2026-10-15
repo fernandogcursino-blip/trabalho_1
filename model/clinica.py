@@ -33,7 +33,7 @@ class Clinica:
         Recebe um objeto 'time' (horário do atendimento) e verifica se 
         está dentro do intervalo de funcionamento da clínica.
         """
-        # Converte as strings guardadas (ex: "08:00") para objetos time antes de comparar
+
         abertura = datetime.strptime(self._horario_abertura, "%H:%M").time()
         fechamento = datetime.strptime(self._horario_fechamento, "%H:%M").time()
         
