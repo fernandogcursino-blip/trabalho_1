@@ -1,74 +1,104 @@
-from datetime import datetime
-
 class TelaAtendimento:
     def __init__(self, controlador):
         self._controlador = controlador
 
+    def le_num_inteiro(self, mensagem: str = "", inteiros_validos: list = None):
+        while True:
+            valor_lido = input(mensagem)
+            try:
+                inteiro = int(valor_lido)
+                if inteiros_validos and inteiro not in inteiros_validos:
+                    raise ValueError
+                return inteiro
+            except ValueError:
+                print("Valor incorreto: Digite um número inteiro válido.")
+                if inteiros_validos:
+                    print(f"Valores válidos: {inteiros_validos}")
+
     def mostra_tela_opcoes(self):
         print("\n--- MENU DE ATENDIMENTOS ---")
-        print("1 - Agendar Atendimento")
-        print("4 - Listar Atendimentos")
+        print("1 - Iniciar Novo Atendimento")
+        print("2 - Adicionar Procedimento a um Atendimento")
+        print("3 - Listar Atendimentos")
         print("0 - Retornar")
-        
-        try:
-            return int(input("Escolha a opção: "))
-        except ValueError:
-            return -1
+        return self.le_num_inteiro("Escolha a opção: ", [0, 1, 2, 3])
 
-    def pega_dados_atendimento(self, pacientes, profissionais, clinicas):
-        print("\n--- AGENDAR ATENDIMENTO ---")
+    def pega_dados_atendimento(self, pacientes, profissionais):
+        print("\n--- NOVO ATENDIMENTO ---")
+        codigo = self.le_num_inteiro("Código do Atendimento (número): ")
+        data = input("Data (DD/MM/AAAA): ").strip()
+        horario = input("Horário de Início (HH:MM): ").strip()
+        horario_fim = input("Horário de Fim (HH:MM): ").strip()
+        tipo_atendimento = input("Tipo de Atendimento (ex: Consulta, Retorno, Exame): ").strip()
         
-        # Seleção da Clínica (Exemplo simplificado pegando a primeira, mas você pode iterar)
-        print("\nClínicas disponíveis:")
-        for i, c in enumerate(clinicas):
-            print(f"{i} - {c._nome}")
-        idx_clinica = int(input("Escolha o número da clínica: "))
-        clinica_selecionada = clinicas[idx_clinica]
+        while True:
+            valor_str = input("Valor Base (R$): ").strip().replace(',', '.')
+            try:
+                valor_base = float(valor_str)
+                break
+            except ValueError:
+                print("Valor inválido. Digite um número (ex: 150.50).")
 
-        # Seleção do Paciente
-        print("\nPacientes disponíveis:")
+        print("\n--- SELECIONE O PACIENTE ---")
         for i, p in enumerate(pacientes):
-            print(f"{i} - {p.nome} (CPF: {p.cpf})")
-        idx_pac = int(input("Escolha o número do paciente: "))
-        paciente_selecionado = pacientes[idx_pac]
+            print(f"[{i}] {p.nome} (CPF: {p.cpf})")
+        idx_paciente = self.le_num_inteiro("Número do Paciente: ", list(range(len(pacientes))))
+        paciente_escolhido = pacientes[idx_paciente]
 
-        # Seleção do Profissional
-        print("\nProfissionais disponíveis:")
-        for i, pr in enumerate(profissionais):
-            print(f"{i} - {pr.nome} (Esp: {pr._especialidade})")
-        idx_prof = int(input("Escolha o número do profissional: "))
-        profissional_selecionado = profissionais[idx_prof]
+        print("\n--- SELECIONE O PROFISSIONAL ---")
+        for i, prof in enumerate(profissionais):
+            print(f"[{i}] {prof.nome} - {prof.especialidade} (Clínica: {prof.clinica.nome})")
+        idx_profissional = self.le_num_inteiro("Número do Profissional: ", list(range(len(profissionais))))
+        profissional_escolhido = profissionais[idx_profissional]
 
-        # Dados do agendamento
-        data_str = input("\nData do Atendimento (DD/MM/AAAA): ")
-        inicio_str = input("Horário de Início (HH:MM): ")
-        fim_str = input("Horário de Término (HH:MM): ")
-        tipo = input("Tipo de Atendimento (Consulta, Exame, etc): ")
-        valor = float(input("Valor base (R$): "))
+        return {
+            "codigo": codigo,
+            "paciente": paciente_escolhido,
+            "profissional": profissional_escolhido,
+            "data": data,
+            "horario": horario,
+            "horario_fim": horario_fim,
+            "tipo_atendimento": tipo_atendimento,
+            "valor_base": valor_base
+        }
 
-        try:
-            data_atendimento = datetime.strptime(data_str, "%d/%m/%Y").date()
-            horario_inicio = datetime.strptime(inicio_str, "%H:%M").time()
-            horario_fim = datetime.strptime(fim_str, "%H:%M").time()
-            
-            return {
-                "clinica": clinica_selecionada,
-                "paciente": paciente_selecionado,
-                "profissional": profissional_selecionado,
-                "data": data_atendimento,
-                "horario_inicio": horario_inicio,
-                "horario_fim": horario_fim,
-                "tipo": tipo,
-                "valor_base": valor
-            }
-        except ValueError:
-            print("Erro: Formato de data ou hora inválido!")
-            return None
+    def pega_dados_procedimento(self):
+        print("\n--- DADOS DO PROCEDIMENTO ---")
+        nome = input("Nome do procedimento (ex: Consulta, Exame): ").strip()
+        
+        while True:
+            valor_str = input("Valor do procedimento (R$): ").strip().replace(',', '.')
+            try:
+                valor = float(valor_str)
+                break
+            except ValueError:
+                print("Valor inválido. Digite um número (ex: 150.50).")
+
+        return {"nome": nome, "valor": valor}
 
     def mostra_atendimentos(self, atendimentos):
         print("\n--- LISTA DE ATENDIMENTOS ---")
         for a in atendimentos:
-            print(f"Data: {a._data_atendimento} | Paciente: {a._paciente.nome} | Profissional: {a._profissional.nome} | Clínica: {a._clinica._nome}")
+            codigo = a.codigo if hasattr(a, 'codigo') else a._codigo
+            data = a.data if hasattr(a, 'data') else a._data
+            tipo = a.tipo_atendimento if hasattr(a, 'tipo_atendimento') else getattr(a, '_tipo_atendimento', 'N/A')
+            valor = a.valor_base if hasattr(a, 'valor_base') else getattr(a, '_valor_base', 0.0)
+            
+            procedimentos = a.procedimentos if hasattr(a, 'procedimentos') else getattr(a, '_procedimentos', [])
+            
+            print(f"\nCódigo: {codigo} | Data: {data} | Tipo: {tipo} | Valor Base: R$ {valor:.2f}")
+            print(f"Paciente: {a.paciente.nome}")
+            print(f"Profissional: {a.profissional.nome} ({a.profissional.especialidade})")
+            
+            if procedimentos:
+                print("Procedimentos realizados:")
+                for p in procedimentos:
+                    nome_proc = p.nome if hasattr(p, 'nome') else p._nome
+                    valor_proc = p.valor if hasattr(p, 'valor') else p._valor
+                    print(f"  - {nome_proc}: R$ {valor_proc:.2f}")
+            else:
+                print("Procedimentos: Nenhum procedimento registrado.")
+            print("-" * 30)
 
     def mostra_mensagem(self, mensagem):
         print(f"\n{mensagem}")

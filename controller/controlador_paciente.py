@@ -1,4 +1,4 @@
-from model.paciente import Paciente
+from model import Paciente
 from view.tela_paciente import TelaPaciente
 
 class ControladorPaciente:
@@ -7,31 +7,29 @@ class ControladorPaciente:
         self._controlador_sistema = controlador_sistema
         self._pacientes = []
 
+    # Propriedade crucial para o Atendimento conseguir ler os pacientes
+    @property
+    def pacientes(self):
+        return self._pacientes
+
     def inicia(self):
-        """Inicia o menu de pacientes."""
         self.abre_tela_inicial()
 
     def inclui_paciente(self):
-        dados_paciente = self._tela_paciente.pega_dados_paciente()
-        if not dados_paciente:
+        dados = self._tela_paciente.pega_dados_paciente()
+        if not dados:
             return
             
-        cpf = dados_paciente['cpf']
-        if self.__paciente_existe(cpf):
-            self._tela_paciente.mostra_mensagem(f"Erro: Paciente com CPF {cpf} já existe.")
+        if self.__paciente_existe(dados['cpf']):
+            self._tela_paciente.mostra_mensagem("Erro: Paciente já cadastrado com este CPF.")
             return
             
-        novo_paciente = Paciente(
-            dados_paciente['nome'], 
-            dados_paciente['celular'], 
-            cpf, 
-            dados_paciente['data_nascimento']
-        )
+        # Ajuste os parâmetros aqui caso o seu model/paciente.py receba dados diferentes
+        novo_paciente = Paciente(dados['nome'], dados['cpf'], dados['idade'], dados['telefone'])
         self._pacientes.append(novo_paciente)
-        self._tela_paciente.mostra_mensagem(f"Paciente {dados_paciente['nome']} cadastrado com sucesso!")
+        self._tela_paciente.mostra_mensagem("Paciente cadastrado com sucesso!")
         
     def altera_paciente(self):
-        """Altera os dados de um paciente existente."""
         cpf_antigo = self._tela_paciente.pega_cpf("CPF do paciente a alterar: ")
         if not cpf_antigo:
             return
@@ -45,40 +43,40 @@ class ControladorPaciente:
             return
             
         for i, paciente in enumerate(self._pacientes):
-            if paciente.cpf == cpf_antigo:
-                self._pacientes[i]._nome = novos_dados['nome']
-                self._pacientes[i]._celular = novos_dados['celular']
-                self._pacientes[i]._cpf = novos_dados['cpf']
-                self._pacientes[i]._data_nascimento = novos_dados['data_nascimento']
+            cpf_atual = paciente.cpf if hasattr(paciente, 'cpf') else paciente._cpf
+            if cpf_atual == cpf_antigo:
+                paciente_atualizado = Paciente(
+                    novos_dados['nome'], novos_dados['cpf'], 
+                    novos_dados['idade'], novos_dados['telefone']
+                )
+                self._pacientes[i] = paciente_atualizado
                 self._tela_paciente.mostra_mensagem("Dados do paciente alterados com sucesso!")
                 break
         
     def exclui_paciente(self):
-        """Exclui um paciente pelo CPF."""
         cpf = self._tela_paciente.pega_cpf("CPF do paciente a excluir: ")
         if not cpf:
             return
             
         for i, paciente in enumerate(self._pacientes):
-            if paciente.cpf == cpf:
+            cpf_atual = paciente.cpf if hasattr(paciente, 'cpf') else paciente._cpf
+            if cpf_atual == cpf:
                 del self._pacientes[i]
                 self._tela_paciente.mostra_mensagem(f"Paciente com CPF {cpf} excluído com sucesso!")
                 return
         self._tela_paciente.mostra_mensagem("Paciente não encontrado.")
 
     def lista_pacientes(self):
-        """Lista todos os pacientes."""
         if not self._pacientes:
             self._tela_paciente.mostra_mensagem("Nenhum paciente cadastrado.")
             return
         self._tela_paciente.mostra_pacientes(self._pacientes)
 
     def retornar(self):
-        """Retorna ao menu principal."""
-        self._controlador_sistema.abre_tela_inicial()
+        # Apenas encerra o método, permitindo que o 'break' do loop feche o menu de forma limpa
+        return
     
     def abre_tela_inicial(self):
-        """Abre o menu principal de pacientes."""
         switcher = {
             0: self.retornar,
             1: self.inclui_paciente,
@@ -94,5 +92,8 @@ class ControladorPaciente:
                 break
 
     def __paciente_existe(self, cpf):
-        """Verifica se um paciente com este CPF já existe."""
-        return any(paciente.cpf == cpf for paciente in self._pacientes)
+        for paciente in self._pacientes:
+            cpf_atual = paciente.cpf if hasattr(paciente, 'cpf') else paciente._cpf
+            if cpf_atual == cpf:
+                return True
+        return False

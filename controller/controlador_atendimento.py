@@ -1,5 +1,5 @@
-from model import Atendimento
 from view.tela_atendimento import TelaAtendimento
+from model import Atendimento, Procedimento
 
 class ControladorAtendimento:
     def __init__(self, controlador_sistema):
@@ -7,42 +7,68 @@ class ControladorAtendimento:
         self._controlador_sistema = controlador_sistema
         self._atendimentos = []
 
+    @property
+    def atendimentos(self):
+        return self._atendimentos
+
     def inicia(self):
         self.abre_tela_inicial()
 
     def inclui_atendimento(self):
-        # 1. Buscar as listas dos outros controladores através do sistema
-        pacientes_disponiveis = self._controlador_sistema.controlador_paciente.pacientes
-        profissionais_disponiveis = self._controlador_sistema.controlador_profissional.profissionais
-        clinicas_disponiveis = self._controlador_sistema.controlador_clinica.clinicas
+        pacientes = self._controlador_sistema._controlador_paciente.pacientes
+        profissionais = self._controlador_sistema._controlador_profissional.profissionais
         
-        if not pacientes_disponiveis or not profissionais_disponiveis or not clinicas_disponiveis:
-            self._tela_atendimento.mostra_mensagem("Erro: É necessário ter pelo menos um paciente, profissional e clínica cadastrados.")
+        if not pacientes or not profissionais:
+            self._tela_atendimento.mostra_mensagem("Erro: É preciso ter pelo menos 1 Paciente e 1 Profissional cadastrados!")
             return
 
-        # 2. A tela pede os dados e seleciona os objetos (você pode passar as listas para a tela mostrar e o usuário escolher por índice ou CPF/Nome)
-        dados = self._tela_atendimento.pega_dados_atendimento(pacientes_disponiveis, profissionais_disponiveis, clinicas_disponiveis)
+        dados = self._tela_atendimento.pega_dados_atendimento(pacientes, profissionais)
         if not dados:
             return
-
-        try:
-            # 3. Tenta criar o atendimento (as validações de exceção do Model vão rodar aqui)
-            novo_atendimento = Atendimento(
-                clinica=dados['clinica'],
-                paciente=dados['paciente'],
-                profissional=dados['profissional'],
-                data_atendimento=dados['data'],
-                horario_inicio=dados['horario_inicio'],
-                horario_fim=dados['horario_fim'],
-                tipo_atendimento=dados['tipo'],
-                valor_base=dados['valor_base']
-            )
-            self._atendimentos.append(novo_atendimento)
-            self._tela_atendimento.mostra_mensagem("Atendimento agendado com sucesso!")
             
-        except Exception as e:
-            # Captura as exceções personalizadas (Regra 1 e Regra 2) e mostra na tela
-            self._tela_atendimento.mostra_mensagem(f"Erro ao agendar: {str(e)}")
+        # Cria o atendimento passando TODOS os 8 argumentos exigidos
+        novo_atendimento = Atendimento(
+            dados['codigo'], 
+            dados['paciente'], 
+            dados['profissional'], 
+            dados['data'], 
+            dados['horario'],
+            dados['horario_fim'],
+            dados['tipo_atendimento'],
+            dados['valor_base']
+        )
+        self._atendimentos.append(novo_atendimento)
+        self._tela_atendimento.mostra_mensagem("Atendimento criado com sucesso!")
+
+    def adiciona_procedimento_no_atendimento(self):
+        if not self._atendimentos:
+            self._tela_atendimento.mostra_mensagem("Nenhum atendimento cadastrado para adicionar procedimentos.")
+            return
+
+        codigo = self._tela_atendimento.le_num_inteiro("Código do Atendimento: ")
+        
+        atendimento_encontrado = None
+        for atendimento in self._atendimentos:
+            codigo_atual = atendimento.codigo if hasattr(atendimento, 'codigo') else atendimento._codigo
+            if codigo_atual == codigo:
+                atendimento_encontrado = atendimento
+                break
+                
+        if not atendimento_encontrado:
+            self._tela_atendimento.mostra_mensagem("Atendimento não encontrado.")
+            return
+            
+        dados_procedimento = self._tela_atendimento.pega_dados_procedimento()
+        if dados_procedimento:
+            novo_procedimento = Procedimento(
+                dados_procedimento['nome'], 
+                dados_procedimento['valor']
+            )
+            if hasattr(atendimento_encontrado, 'adiciona_procedimento'):
+                atendimento_encontrado.adiciona_procedimento(novo_procedimento)
+            else:
+                atendimento_encontrado._procedimentos.append(novo_procedimento)
+            self._tela_atendimento.mostra_mensagem("Procedimento adicionado com sucesso!")
 
     def lista_atendimentos(self):
         if not self._atendimentos:
@@ -51,15 +77,15 @@ class ControladorAtendimento:
         self._tela_atendimento.mostra_atendimentos(self._atendimentos)
 
     def retornar(self):
-        self._controlador_sistema.abre_tela_inicial()
+        # Apenas encerra o método, cortando o loop infinito
+        return
     
     def abre_tela_inicial(self):
         switcher = {
             0: self.retornar,
             1: self.inclui_atendimento,
             2: self.adiciona_procedimento_no_atendimento,
-            3: self.registra_pagamento,
-            4: self.lista_atendimentos
+            3: self.lista_atendimentos
         }
         while True:
             opcao = self._tela_atendimento.mostra_tela_opcoes()

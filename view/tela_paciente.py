@@ -1,11 +1,8 @@
-from datetime import datetime
-
 class TelaPaciente:
     def __init__(self, controlador):
         self._controlador = controlador
 
     def le_num_inteiro(self, mensagem: str = "", inteiros_validos: list = None):
-        """Lê um número inteiro com validação."""
         while True:
             valor_lido = input(mensagem)
             try:
@@ -14,13 +11,12 @@ class TelaPaciente:
                     raise ValueError
                 return inteiro
             except ValueError:
-                print("Valor incorreto: Digite um valor numérico inteiro válido.")
+                print("Valor incorreto: Digite um número inteiro válido.")
                 if inteiros_validos:
                     print(f"Valores válidos: {inteiros_validos}")
 
     def mostra_tela_opcoes(self):
-        """Mostra o menu e retorna a opção escolhida."""
-        print("\n--- CADASTRO DE PACIENTES ---")
+        print("\n--- MENU DE PACIENTES ---")
         print("1 - Incluir Paciente")
         print("2 - Alterar Paciente")
         print("3 - Excluir Paciente")
@@ -29,38 +25,31 @@ class TelaPaciente:
         return self.le_num_inteiro("Escolha a opção: ", [0, 1, 2, 3, 4])
 
     def pega_dados_paciente(self):
-        """Solicita os dados para cadastro e retorna um dicionário."""
         print("\n--- DADOS DO PACIENTE ---")
         nome = input("Nome: ").strip()
-        celular = input("Celular: ").strip()
         cpf = input("CPF: ").strip()
+        idade = self.le_num_inteiro("Idade: ")
+        telefone = input("Telefone: ").strip()
         
-        # Aplicando a mesma lógica de repetição do le_num_inteiro para a data
-        while True:
-            data_nascimento_str = input("Data de Nascimento (DD/MM/AAAA): ").strip()
-            try:
-                data_nascimento = datetime.strptime(data_nascimento_str, "%d/%m/%Y").date()
-                break
-            except ValueError:
-                print("Erro: Data em formato inválido! Utilize o formato DD/MM/AAAA.")
+        if not nome or not cpf or not telefone:
+            print("Erro: Nome, CPF e Telefone são obrigatórios.")
+            return None
+            
+        return {"nome": nome, "cpf": cpf, "idade": idade, "telefone": telefone}
 
-        return {
-            "nome": nome, 
-            "celular": celular, 
-            "cpf": cpf, 
-            "data_nascimento": data_nascimento
-        }
-
-    def pega_cpf(self, mensagem="CPF do Paciente: "):
-        """Pede ao utilizador um CPF (string)."""
-        return input(mensagem).strip()
+    def pega_cpf(self, mensagem="Digite o CPF do paciente: "):
+        return input(f"\n{mensagem}").strip()
 
     def mostra_pacientes(self, pacientes):
-        """Exibe a lista de pacientes."""
-        print("\n=== Lista de Pacientes ===")
-        for paciente in pacientes:
-            print(paciente)
-
+        print("\n--- LISTA DE PACIENTES ---")
+        for p in pacientes:
+            nome = p.nome if hasattr(p, 'nome') else p._nome
+            cpf = p.cpf if hasattr(p, 'cpf') else p._cpf
+            # Fallback seguro para atributos que podem não ter getters configurados
+            idade = p.idade if hasattr(p, 'idade') else getattr(p, '_idade', 'N/A')
+            telefone = p.telefone if hasattr(p, 'telefone') else getattr(p, '_telefone', 'N/A')
+            
+            print(f"Nome: {nome} | CPF: {cpf} | Idade: {idade} | Tel: {telefone}")
+            
     def mostra_mensagem(self, mensagem):
-        """Exibe uma mensagem."""
         print(f"\n{mensagem}")

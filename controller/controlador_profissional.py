@@ -15,7 +15,14 @@ class ControladorProfissional:
         self.abre_tela_inicial()
 
     def inclui_profissional(self):
-        dados = self._tela_profissional.pega_dados_profissional()
+        # Acessa a lista de clínicas instanciada no sistema central
+        clinicas = self._controlador_sistema._controlador_clinica.clinicas
+        
+        if not clinicas:
+            self._tela_profissional.mostra_mensagem("Erro: É obrigatório cadastrar uma Clínica primeiro!")
+            return
+
+        dados = self._tela_profissional.pega_dados_profissional(clinicas)
         if not dados:
             return
             
@@ -25,13 +32,13 @@ class ControladorProfissional:
             
         novo_profissional = Profissional(
             dados['nome'], dados['celular'], dados['cpf'], 
-            dados['especialidade'], dados['registro_profissional']
+            dados['especialidade'], dados['registro_profissional'],
+            dados['clinica']
         )
         self._profissionais.append(novo_profissional)
-        self._tela_profissional.mostra_mensagem("Profissional cadastrado com sucesso!")
+        self._tela_profissional.mostra_mensagem("Profissional cadastrado e vinculado à clínica com sucesso!")
         
     def altera_profissional(self):
-        """Altera os dados de um profissional existente."""
         cpf_antigo = self._tela_profissional.pega_cpf("CPF do profissional a alterar: ")
         if not cpf_antigo:
             return
@@ -40,23 +47,23 @@ class ControladorProfissional:
             self._tela_profissional.mostra_mensagem("Profissional não encontrado.")
             return
             
-        novos_dados = self._tela_profissional.pega_dados_profissional()
+        clinicas = self._controlador_sistema._controlador_clinica.clinicas
+        novos_dados = self._tela_profissional.pega_dados_profissional(clinicas)
         if not novos_dados:
             return
             
         for i, profissional in enumerate(self._profissionais):
             if profissional.cpf == cpf_antigo:
-                # Cria um novo objeto para substituir o antigo, evitando o aviso amarelo de acesso a atributos protegidos
                 profissional_atualizado = Profissional(
                     novos_dados['nome'], novos_dados['celular'], novos_dados['cpf'], 
-                    novos_dados['especialidade'], novos_dados['registro_profissional']
+                    novos_dados['especialidade'], novos_dados['registro_profissional'],
+                    novos_dados['clinica']
                 )
                 self._profissionais[i] = profissional_atualizado
                 self._tela_profissional.mostra_mensagem("Dados do profissional alterados com sucesso!")
                 break
         
     def exclui_profissional(self):
-        """Exclui um profissional pelo CPF."""
         cpf = self._tela_profissional.pega_cpf("CPF do profissional a excluir: ")
         if not cpf:
             return
@@ -65,7 +72,7 @@ class ControladorProfissional:
             if profissional.cpf == cpf:
                 del self._profissionais[i]
                 self._tela_profissional.mostra_mensagem(f"Profissional com CPF {cpf} excluído com sucesso!")
-                return # O return aqui é essencial para parar o ciclo após excluir
+                return
         self._tela_profissional.mostra_mensagem("Profissional não encontrado.")
 
     def lista_profissionais(self):
