@@ -15,7 +15,6 @@ class ControladorProfissional:
         self.abre_tela_inicial()
 
     def inclui_profissional(self):
-        # Acessa a lista de clínicas instanciada no sistema central
         clinicas = self._controlador_sistema._controlador_clinica.clinicas
         
         if not clinicas:
@@ -81,8 +80,9 @@ class ControladorProfissional:
             return
         self._tela_profissional.mostra_profissionais(self._profissionais)
 
+    # CORREÇÃO CRÍTICA DO LOOP AQUI:
     def retornar(self):
-        self._controlador_sistema.abre_tela_inicial()
+        return
     
     def abre_tela_inicial(self):
         switcher = {

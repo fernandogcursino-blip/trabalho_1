@@ -7,7 +7,6 @@ class ControladorPaciente:
         self._controlador_sistema = controlador_sistema
         self._pacientes = []
 
-    # Propriedade crucial para o Atendimento conseguir ler os pacientes
     @property
     def pacientes(self):
         return self._pacientes
@@ -24,8 +23,12 @@ class ControladorPaciente:
             self._tela_paciente.mostra_mensagem("Erro: Paciente já cadastrado com este CPF.")
             return
             
-        # Ajuste os parâmetros aqui caso o seu model/paciente.py receba dados diferentes
-        novo_paciente = Paciente(dados['nome'], dados['cpf'], dados['idade'], dados['telefone'])
+        novo_paciente = Paciente(
+            dados['nome'], 
+            dados['cpf'], 
+            dados['data_nascimento'], 
+            dados['telefone']
+        )
         self._pacientes.append(novo_paciente)
         self._tela_paciente.mostra_mensagem("Paciente cadastrado com sucesso!")
         
@@ -43,11 +46,12 @@ class ControladorPaciente:
             return
             
         for i, paciente in enumerate(self._pacientes):
-            cpf_atual = paciente.cpf if hasattr(paciente, 'cpf') else paciente._cpf
-            if cpf_atual == cpf_antigo:
+            if paciente.cpf == cpf_antigo:
                 paciente_atualizado = Paciente(
-                    novos_dados['nome'], novos_dados['cpf'], 
-                    novos_dados['idade'], novos_dados['telefone']
+                    novos_dados['nome'], 
+                    novos_dados['cpf'], 
+                    novos_dados['data_nascimento'], 
+                    novos_dados['telefone']
                 )
                 self._pacientes[i] = paciente_atualizado
                 self._tela_paciente.mostra_mensagem("Dados do paciente alterados com sucesso!")
@@ -59,8 +63,7 @@ class ControladorPaciente:
             return
             
         for i, paciente in enumerate(self._pacientes):
-            cpf_atual = paciente.cpf if hasattr(paciente, 'cpf') else paciente._cpf
-            if cpf_atual == cpf:
+            if paciente.cpf == cpf:
                 del self._pacientes[i]
                 self._tela_paciente.mostra_mensagem(f"Paciente com CPF {cpf} excluído com sucesso!")
                 return
@@ -73,7 +76,6 @@ class ControladorPaciente:
         self._tela_paciente.mostra_pacientes(self._pacientes)
 
     def retornar(self):
-        # Apenas encerra o método, permitindo que o 'break' do loop feche o menu de forma limpa
         return
     
     def abre_tela_inicial(self):
@@ -93,7 +95,6 @@ class ControladorPaciente:
 
     def __paciente_existe(self, cpf):
         for paciente in self._pacientes:
-            cpf_atual = paciente.cpf if hasattr(paciente, 'cpf') else paciente._cpf
-            if cpf_atual == cpf:
+            if paciente.cpf == cpf:
                 return True
         return False

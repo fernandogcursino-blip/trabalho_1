@@ -1,47 +1,61 @@
-from datetime import date, time
-from model.clinica import Clinica
-from model.paciente import Paciente
-from model.profissional import Profissional
-from model.procedimento import Procedimento
-from model.pagamento import Pagamento
-from model.excecoes import HorarioInvalidoException, DataPagamentoInvalidaException
+from datetime import datetime
 
 class Atendimento:
-    def __init__(self, clinica: Clinica, paciente: Paciente, profissional: Profissional, 
-                 data_atendimento: date, horario_inicio: time, horario_fim: time, tipo_atendimento: str, valor_base: float):
-        
-        # Validação Regra 1
-        paciente.validar_independencia()
-        
-        # Validação Regra 2
-        if not clinica.verifica_horario_funcionamento(horario_inicio) or not clinica.verifica_horario_funcionamento(horario_fim):
-            raise HorarioInvalidoException("O atendimento está fora do horário de funcionamento da clínica.")
-
-        self._clinica = clinica              
-        self._paciente = paciente            
-        self._profissional = profissional    
-        self._data_atendimento = data_atendimento
+    def __init__(self, codigo, paciente, profissional, data, horario_inicio, horario_fim, tipo_atendimento, valor_base):
+        self._codigo = codigo
+        self._paciente = paciente
+        self._profissional = profissional
+        self._data = data
         self._horario_inicio = horario_inicio
         self._horario_fim = horario_fim
         self._tipo_atendimento = tipo_atendimento
         self._valor_base = valor_base
+        self._procedimentos = []
+
+        # 1. Valida o paciente
+        self._paciente.validar_independencia()
+
+        # 2. Puxa a clínica do profissional de forma segura
+        clinica = self._profissional.clinica
         
-        self._procedimentos = [] 
-        self._pagamentos = []    
+        # 3. Converte os horários digitados (strings) para objetos 'time' para poder comparar
+        try:
+            inicio_time = datetime.strptime(horario_inicio, "%H:%M").time()
+            fim_time = datetime.strptime(horario_fim, "%H:%M").time()
+            
+            # Verifica se a clínica armazenada é um objeto válido e compara os horários
+            if hasattr(clinica, 'verifica_horario_funcionamento'):
+                if not clinica.verifica_horario_funcionamento(inicio_time) or not clinica.verifica_horario_funcionamento(fim_time):
+                    raise ValueError("O horário escolhido ultrapassa o horário de funcionamento da clínica!")
+        except ValueError as e:
+            raise ValueError(f"Erro no agendamento: {e}")
 
-    def adicionar_procedimento(self, procedimento: Procedimento):
+    @property
+    def codigo(self): return self._codigo
+
+    @property
+    def paciente(self): return self._paciente
+    
+    @property
+    def profissional(self): return self._profissional
+
+    @property
+    def data(self): return self._data
+
+    @property
+    def horario_inicio(self): return self._horario_inicio
+
+    @property
+    def horario_fim(self): return self._horario_fim
+
+    @property
+    def tipo_atendimento(self): return self._tipo_atendimento
+
+    @property
+    def valor_base(self): return self._valor_base
+
+    @property
+    def procedimentos(self): return self._procedimentos
+
+    def adiciona_procedimento(self, procedimento):
         self._procedimentos.append(procedimento)
-
-    def adicionar_pagamento(self, pagamento: Pagamento):
-        # Validação Regra 3
-        if pagamento._data_pagamento > self._data_atendimento:
-            raise DataPagamentoInvalidaException("O pagamento deve ser realizado até a data do atendimento.")
-        self._pagamentos.append(pagamento)
-
-    def calcular_valor_total(self) -> float:
-        total_procedimentos = sum(p.custo for p in self._procedimentos)
-        return self._valor_base + total_procedimentos
-
-    def calcular_valor_restante(self) -> float:
-        total_pago = sum(p.valor_pago for p in self._pagamentos)
-        return self.calcular_valor_total() - total_pago

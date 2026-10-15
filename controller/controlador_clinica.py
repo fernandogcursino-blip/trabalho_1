@@ -24,7 +24,7 @@ class ControladorClinica:
             return
             
         nova_clinica = Clinica(
-            dados['nome'], dados['cnpj'], dados['endereco'], 
+            dados['nome'], dados['cnpj'], dados['endereco'],
             dados['horario_abertura'], dados['horario_fechamento']
         )
         self._clinicas.append(nova_clinica)
@@ -44,11 +44,8 @@ class ControladorClinica:
             return
             
         for i, clinica in enumerate(self._clinicas):
-            # Acede à propriedade ou atributo dependendo de como definiste no model
             cnpj_atual = clinica.cnpj if hasattr(clinica, 'cnpj') else clinica._cnpj
-            
             if cnpj_atual == cnpj_antigo:
-                # Cria um novo objeto para substituir o antigo
                 clinica_atualizada = Clinica(
                     novos_dados['nome'], novos_dados['cnpj'], novos_dados['endereco'],
                     novos_dados['horario_abertura'], novos_dados['horario_fechamento']
@@ -76,8 +73,9 @@ class ControladorClinica:
             return
         self._tela_clinica.mostra_clinicas(self._clinicas)
 
+    # CORREÇÃO CRÍTICA DO LOOP AQUI:
     def retornar(self):
-        self._controlador_sistema.abre_tela_inicial()
+        return
     
     def abre_tela_inicial(self):
         switcher = {

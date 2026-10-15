@@ -26,7 +26,6 @@ class ControladorAtendimento:
         if not dados:
             return
             
-        # Cria o atendimento passando TODOS os 8 argumentos exigidos
         novo_atendimento = Atendimento(
             dados['codigo'], 
             dados['paciente'], 
@@ -60,10 +59,13 @@ class ControladorAtendimento:
             
         dados_procedimento = self._tela_atendimento.pega_dados_procedimento()
         if dados_procedimento:
+            # CORREÇÃO: Repassando o profissional do atendimento para o procedimento
             novo_procedimento = Procedimento(
                 dados_procedimento['nome'], 
-                dados_procedimento['valor']
+                dados_procedimento['valor'],
+                atendimento_encontrado.profissional
             )
+            
             if hasattr(atendimento_encontrado, 'adiciona_procedimento'):
                 atendimento_encontrado.adiciona_procedimento(novo_procedimento)
             else:
@@ -77,7 +79,6 @@ class ControladorAtendimento:
         self._tela_atendimento.mostra_atendimentos(self._atendimentos)
 
     def retornar(self):
-        # Apenas encerra o método, cortando o loop infinito
         return
     
     def abre_tela_inicial(self):

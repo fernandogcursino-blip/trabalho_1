@@ -28,14 +28,14 @@ class TelaPaciente:
         print("\n--- DADOS DO PACIENTE ---")
         nome = input("Nome: ").strip()
         cpf = input("CPF: ").strip()
-        idade = self.le_num_inteiro("Idade: ")
+        data_nascimento = input("Data de Nascimento (DD/MM/AAAA): ").strip()
         telefone = input("Telefone: ").strip()
         
-        if not nome or not cpf or not telefone:
-            print("Erro: Nome, CPF e Telefone são obrigatórios.")
+        if not nome or not cpf or not data_nascimento or not telefone:
+            print("Erro: Todos os campos são obrigatórios.")
             return None
             
-        return {"nome": nome, "cpf": cpf, "idade": idade, "telefone": telefone}
+        return {"nome": nome, "cpf": cpf, "data_nascimento": data_nascimento, "telefone": telefone}
 
     def pega_cpf(self, mensagem="Digite o CPF do paciente: "):
         return input(f"\n{mensagem}").strip()
@@ -43,13 +43,8 @@ class TelaPaciente:
     def mostra_pacientes(self, pacientes):
         print("\n--- LISTA DE PACIENTES ---")
         for p in pacientes:
-            nome = p.nome if hasattr(p, 'nome') else p._nome
-            cpf = p.cpf if hasattr(p, 'cpf') else p._cpf
-            # Fallback seguro para atributos que podem não ter getters configurados
-            idade = p.idade if hasattr(p, 'idade') else getattr(p, '_idade', 'N/A')
-            telefone = p.telefone if hasattr(p, 'telefone') else getattr(p, '_telefone', 'N/A')
-            
-            print(f"Nome: {nome} | CPF: {cpf} | Idade: {idade} | Tel: {telefone}")
+            # Como blindamos o Model, podemos acessar os atributos diretamente!
+            print(f"Nome: {p.nome} | CPF: {p.cpf} | Nasc: {p.data_nascimento} | Tel: {p.telefone}")
             
     def mostra_mensagem(self, mensagem):
         print(f"\n{mensagem}")

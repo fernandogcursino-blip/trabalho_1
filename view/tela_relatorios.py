@@ -11,23 +11,24 @@ class TelaRelatorios:
                     raise ValueError
                 return inteiro
             except ValueError:
-                print("Valor incorreto: Digite um valor numérico inteiro válido.")
+                print("Valor incorreto: Digite um número inteiro válido.")
                 if inteiros_validos:
                     print(f"Valores válidos: {inteiros_validos}")
 
     def mostra_tela_opcoes(self):
         print("\n--- MENU DE RELATÓRIOS ---")
-        print("1 - Clínicas com maior número de atendimentos")
-        print("2 - Atendimentos mais caros e mais baratos")
-        print("3 - Procedimentos mais realizados (populares)")
-        print("4 - Procedimentos mais caros e mais baratos")
+        print("1 - Relatório de Clínicas com mais atendimentos")
+        # Pode adicionar os prints dos outros relatórios aqui
         print("0 - Retornar")
-        return self.le_num_inteiro("Escolha a opção: ", [0, 1, 2, 3, 4])
+        return self.le_num_inteiro("Escolha a opção: ", [0, 1])
 
+    def mostra_relatorio_clinicas(self, clinicas_ordenadas):
+        print("\n--- RELATÓRIO: CLÍNICAS COM MAIS ATENDIMENTOS ---")
+        # Enumerate ajuda a criar a numeração do ranking (1º, 2º, 3º...)
+        for posicao, (nome_clinica, quantidade) in enumerate(clinicas_ordenadas, start=1):
+            texto_atendimento = "atendimento" if quantidade == 1 else "atendimentos"
+            print(f"{posicao}º Lugar: {nome_clinica} - {quantidade} {texto_atendimento}")
+        print("-" * 50)
+            
     def mostra_mensagem(self, mensagem):
         print(f"\n{mensagem}")
-
-    def mostra_dados_relatorio(self, titulo, linhas_dados):
-        print(f"\n=== {titulo} ===")
-        for linha in linhas_dados:
-            print(linha)

@@ -1,22 +1,17 @@
-from model.profissional import Profissional
-
 class Procedimento:
-    def __init__(self, descricao: str, custo: float, profissional: Profissional):
-        self._descricao = descricao
-        self._custo = custo
+    def __init__(self, nome: str, valor: float, profissional):
+        self._nome = nome
+        self._valor = valor
         self._profissional = profissional
-        
-    @property
-    def descricao(self):
-        return self._descricao
 
     @property
-    def custo(self):
-        return self._custo
+    def nome(self):
+        return self._nome
+
+    @property
+    def valor(self):
+        return self._valor
         
     @property
     def profissional(self):
         return self._profissional
-
-    def __str__(self):
-        return f"Procedimento(descricao={self._descricao}, custo={self._custo}, profissional={self._profissional.nome})"
