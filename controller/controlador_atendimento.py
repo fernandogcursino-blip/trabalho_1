@@ -57,8 +57,8 @@ class ControladorAtendimento:
         switcher = {
             0: self.retornar,
             1: self.inclui_atendimento,
-            # 2: self.adiciona_procedimento_no_atendimento,
-            # 3: self.registra_pagamento,
+            2: self.adiciona_procedimento_no_atendimento,
+            3: self.registra_pagamento,
             4: self.lista_atendimentos
         }
         while True:

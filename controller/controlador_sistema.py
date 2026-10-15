@@ -2,8 +2,8 @@ from controller.controlador_paciente import ControladorPaciente
 from controller.controlador_profissional import ControladorProfissional
 from controller.controlador_clinica import ControladorClinica
 from controller.controlador_atendimento import ControladorAtendimento
+from controller.controlador_relatorios import ControladorRelatorios
 from view.tela_sistema import TelaSistema
-# Adicione depois o ControladorRelatorios
 
 class ControladorSistema:
     def __init__(self):
@@ -12,6 +12,7 @@ class ControladorSistema:
         self._controlador_profissional = ControladorProfissional(self)
         self._controlador_clinica = ControladorClinica(self)
         self._controlador_atendimento = ControladorAtendimento(self)
+        self._controlador_relatorios = ControladorRelatorios(self)
 
     @property
     def controlador_paciente(self):
@@ -24,6 +25,10 @@ class ControladorSistema:
     @property
     def controlador_clinica(self):
         return self._controlador_clinica
+        
+    @property
+    def controlador_atendimento(self):
+        return self._controlador_atendimento
 
     def inicializa_sistema(self):
         self.abre_tela_inicial()
@@ -39,6 +44,9 @@ class ControladorSistema:
 
     def gerencia_atendimentos(self):
         self._controlador_atendimento.inicia()
+        
+    def emite_relatorios(self):
+        self._controlador_relatorios.inicia()
 
     def encerra_sistema(self):
         exit(0)
@@ -49,7 +57,8 @@ class ControladorSistema:
             1: self.cadastra_clinicas,
             2: self.cadastra_profissionais,
             3: self.cadastra_pacientes,
-            4: self.gerencia_atendimentos
+            4: self.gerencia_atendimentos,
+            5: self.emite_relatorios
         }
         while True:
             opcao = self._tela_sistema.mostra_opcoes()
