@@ -26,18 +26,93 @@ class ControladorAtendimento:
         if not dados:
             return
             
-        novo_atendimento = Atendimento(
-            dados['codigo'], 
-            dados['paciente'], 
-            dados['profissional'], 
-            dados['data'], 
-            dados['horario'],
-            dados['horario_fim'],
-            dados['tipo_atendimento'],
-            dados['valor_base']
-        )
-        self._atendimentos.append(novo_atendimento)
-        self._tela_atendimento.mostra_mensagem("Atendimento criado com sucesso!")
+        if self.__atendimento_existe(dados['codigo']):
+            self._tela_atendimento.mostra_mensagem("Erro: Já existe um atendimento com este código.")
+            return
+            
+        try:
+            novo_atendimento = Atendimento(
+                dados['codigo'], 
+                dados['paciente'], 
+                dados['profissional'], 
+                dados['data'], 
+                dados['horario'],
+                dados['horario_fim'],
+                dados['tipo_atendimento'],
+                dados['valor_base']
+            )
+            self._atendimentos.append(novo_atendimento)
+            self._tela_atendimento.mostra_mensagem("Atendimento criado com sucesso!")
+        except Exception as e:
+            self._tela_atendimento.mostra_mensagem(f"Erro ao criar atendimento: {e}")
+
+    def altera_atendimento(self):
+        if not self._atendimentos:
+            self._tela_atendimento.mostra_mensagem("Nenhum atendimento cadastrado.")
+            return
+
+        codigo = self._tela_atendimento.le_num_inteiro("Digite o código do atendimento que deseja alterar: ")
+        
+        atendimento_encontrado = None
+        indice = -1
+        for i, a in enumerate(self._atendimentos):
+            codigo_atual = a.codigo if hasattr(a, 'codigo') else a._codigo
+            if codigo_atual == codigo:
+                atendimento_encontrado = a
+                indice = i
+                break
+                
+        if not atendimento_encontrado:
+            self._tela_atendimento.mostra_mensagem("Atendimento não encontrado.")
+            return
+
+        pacientes = self._controlador_sistema._controlador_paciente.pacientes
+        profissionais = self._controlador_sistema._controlador_profissional.profissionais
+        
+        self._tela_atendimento.mostra_mensagem("Insira os novos dados do atendimento:")
+        novos_dados = self._tela_atendimento.pega_dados_atendimento(pacientes, profissionais)
+        if not novos_dados:
+            return
+            
+        try:
+            atendimento_atualizado = Atendimento(
+                novos_dados['codigo'], 
+                novos_dados['paciente'], 
+                novos_dados['profissional'], 
+                novos_dados['data'], 
+                novos_dados['horario'],
+                novos_dados['horario_fim'],
+                novos_dados['tipo_atendimento'],
+                novos_dados['valor_base']
+            )
+            
+            # Recupera os procedimentos do atendimento antigo para não os perder
+            procedimentos_antigos = atendimento_encontrado.procedimentos if hasattr(atendimento_encontrado, 'procedimentos') else getattr(atendimento_encontrado, '_procedimentos', [])
+            
+            # Injeta o histórico de procedimentos no novo objeto gerado
+            if hasattr(atendimento_atualizado, '_procedimentos'):
+                atendimento_atualizado._procedimentos = procedimentos_antigos
+                
+            self._atendimentos[indice] = atendimento_atualizado
+            self._tela_atendimento.mostra_mensagem("Atendimento alterado com sucesso!")
+        except Exception as e:
+            self._tela_atendimento.mostra_mensagem(f"Erro ao alterar atendimento: {e}")
+
+    def exclui_atendimento(self):
+        if not self._atendimentos:
+            self._tela_atendimento.mostra_mensagem("Nenhum atendimento cadastrado.")
+            return
+
+        codigo = self._tela_atendimento.le_num_inteiro("Digite o código do atendimento a excluir: ")
+        
+        for i, atendimento in enumerate(self._atendimentos):
+            codigo_atual = atendimento.codigo if hasattr(atendimento, 'codigo') else atendimento._codigo
+            if codigo_atual == codigo:
+                del self._atendimentos[i]
+                self._tela_atendimento.mostra_mensagem(f"Atendimento {codigo} excluído com sucesso!")
+                return
+                
+        self._tela_atendimento.mostra_mensagem("Atendimento não encontrado.")
 
     def adiciona_procedimento_no_atendimento(self):
         if not self._atendimentos:
@@ -59,7 +134,6 @@ class ControladorAtendimento:
             
         dados_procedimento = self._tela_atendimento.pega_dados_procedimento()
         if dados_procedimento:
-            # CORREÇÃO: Repassando o profissional do atendimento para o procedimento
             novo_procedimento = Procedimento(
                 dados_procedimento['nome'], 
                 dados_procedimento['valor'],
@@ -85,8 +159,10 @@ class ControladorAtendimento:
         switcher = {
             0: self.retornar,
             1: self.inclui_atendimento,
-            2: self.adiciona_procedimento_no_atendimento,
-            3: self.lista_atendimentos
+            2: self.altera_atendimento,
+            3: self.exclui_atendimento,
+            4: self.adiciona_procedimento_no_atendimento,
+            5: self.lista_atendimentos
         }
         while True:
             opcao = self._tela_atendimento.mostra_tela_opcoes()
@@ -94,3 +170,10 @@ class ControladorAtendimento:
             funcao_escolhida()
             if opcao == 0:
                 break
+
+    def __atendimento_existe(self, codigo):
+        for atendimento in self._atendimentos:
+            codigo_atual = atendimento.codigo if hasattr(atendimento, 'codigo') else atendimento._codigo
+            if codigo_atual == codigo:
+                return True
+        return False

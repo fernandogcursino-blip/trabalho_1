@@ -18,16 +18,64 @@ class TelaRelatorios:
     def mostra_tela_opcoes(self):
         print("\n--- MENU DE RELATÓRIOS ---")
         print("1 - Relatório de Clínicas com mais atendimentos")
-        # Pode adicionar os prints dos outros relatórios aqui
+        print("2 - Atendimentos mais caros e mais baratos")
+        print("3 - Procedimentos mais realizados (populares)")
+        print("4 - Procedimentos mais caros e mais baratos")
         print("0 - Retornar")
-        return self.le_num_inteiro("Escolha a opção: ", [0, 1])
+        return self.le_num_inteiro("Escolha a opção: ", [0, 1, 2, 3, 4])
 
     def mostra_relatorio_clinicas(self, clinicas_ordenadas):
         print("\n--- RELATÓRIO: CLÍNICAS COM MAIS ATENDIMENTOS ---")
-        # Enumerate ajuda a criar a numeração do ranking (1º, 2º, 3º...)
         for posicao, (nome_clinica, quantidade) in enumerate(clinicas_ordenadas, start=1):
             texto_atendimento = "atendimento" if quantidade == 1 else "atendimentos"
             print(f"{posicao}º Lugar: {nome_clinica} - {quantidade} {texto_atendimento}")
+        print("-" * 50)
+
+    def mostra_relatorio_atendimentos_valores(self, atendimentos_ordenados):
+        print("\n--- RELATÓRIO: ATENDIMENTOS MAIS CAROS E MAIS BARATOS ---")
+        if not atendimentos_ordenados:
+            print("Nenhum dado para exibir.")
+            return
+            
+        # O mais caro é o primeiro da lista (posição 0)
+        mais_caro, valor_caro = atendimentos_ordenados[0]
+        print(f"[MAIS CARO] -> Código: {mais_caro.codigo} | Valor Total: R$ {valor_caro:.2f} | Paciente: {mais_caro.paciente.nome}")
+        
+        # O mais barato é o último da lista (posição -1)
+        mais_barato, valor_barato = atendimentos_ordenados[-1]
+        print(f"[MAIS BARATO] -> Código: {mais_barato.codigo} | Valor Total: R$ {valor_barato:.2f} | Paciente: {mais_barato.paciente.nome}")
+        
+        print("\nRanking Completo:")
+        for posicao, (a, valor) in enumerate(atendimentos_ordenados, start=1):
+            print(f"{posicao}º - Atendimento {a.codigo} (Paciente: {a.paciente.nome}) - R$ {valor:.2f}")
+        print("-" * 50)
+
+    def mostra_relatorio_procedimentos_realizados(self, procedimentos_ordenados):
+        print("\n--- RELATÓRIO: PROCEDIMENTOS MAIS REALIZADOS ---")
+        if not procedimentos_ordenados:
+            print("Nenhum procedimento registrado nos atendimentos.")
+            return
+            
+        for posicao, (nome_proc, quantidade) in enumerate(procedimentos_ordenados, start=1):
+            texto = "vez" if quantidade == 1 else "vezes"
+            print(f"{posicao}º Lugar: {nome_proc} - Realizado {quantidade} {texto}")
+        print("-" * 50)
+
+    def mostra_relatorio_procedimentos_valores(self, procedimentos_ordenados):
+        print("\n--- RELATÓRIO: PROCEDIMENTOS MAIS CAROS E MAIS BARATOS ---")
+        if not procedimentos_ordenados:
+            print("Nenhum procedimento registrado.")
+            return
+            
+        nome_caro, valor_caro = procedimentos_ordenados[0]
+        print(f"[MAIS CARO] -> Procedimento: {nome_caro} | Valor: R$ {valor_caro:.2f}")
+        
+        nome_barato, valor_barato = procedimentos_ordenados[-1]
+        print(f"[MAIS BARATO] -> Procedimento: {nome_barato} | Valor: R$ {valor_barato:.2f}")
+        
+        print("\nRanking Completo:")
+        for posicao, (nome_proc, valor) in enumerate(procedimentos_ordenados, start=1):
+            print(f"{posicao}º - {nome_proc} - R$ {valor:.2f}")
         print("-" * 50)
             
     def mostra_mensagem(self, mensagem):

@@ -18,13 +18,15 @@ class TelaAtendimento:
     def mostra_tela_opcoes(self):
         print("\n--- MENU DE ATENDIMENTOS ---")
         print("1 - Iniciar Novo Atendimento")
-        print("2 - Adicionar Procedimento a um Atendimento")
-        print("3 - Listar Atendimentos")
+        print("2 - Alterar Atendimento")
+        print("3 - Excluir Atendimento")
+        print("4 - Adicionar Procedimento a um Atendimento")
+        print("5 - Listar Atendimentos")
         print("0 - Retornar")
-        return self.le_num_inteiro("Escolha a opção: ", [0, 1, 2, 3])
+        return self.le_num_inteiro("Escolha a opção: ", [0, 1, 2, 3, 4, 5])
 
     def pega_dados_atendimento(self, pacientes, profissionais):
-        print("\n--- NOVO ATENDIMENTO ---")
+        print("\n--- DADOS DO ATENDIMENTO ---")
         codigo = self.le_num_inteiro("Código do Atendimento (número): ")
         data = input("Data (DD/MM/AAAA): ").strip()
         horario = input("Horário de Início (HH:MM): ").strip()
