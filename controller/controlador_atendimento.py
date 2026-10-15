@@ -19,12 +19,13 @@ class ControladorAtendimento:
     def inclui_atendimento(self):
         pacientes = self._controlador_sistema._controlador_paciente.pacientes
         profissionais = self._controlador_sistema._controlador_profissional.profissionais
+        tipos = self._controlador_sistema._controlador_tipo_atendimento.tipos
         
-        if not pacientes or not profissionais:
-            self._tela_atendimento.mostra_mensagem("Erro: É preciso ter pelo menos 1 Paciente e 1 Profissional cadastrados!")
+        if not pacientes or not profissionais or not tipos:
+            self._tela_atendimento.mostra_mensagem("Erro: É preciso ter pelo menos 1 Paciente, 1 Profissional e 1 Tipo de Atendimento cadastrados!")
             return
 
-        dados = self._tela_atendimento.pega_dados_atendimento(pacientes, profissionais)
+        dados = self._tela_atendimento.pega_dados_atendimento(pacientes, profissionais, tipos)
         if not dados:
             return
             
@@ -45,7 +46,6 @@ class ControladorAtendimento:
             mensagem_erro = f"\n======================================================\n❌ AGENDAMENTO CANCELADO (HORÁRIO):\n{e}\n======================================================"
             self._tela_atendimento.mostra_mensagem(mensagem_erro)
         except Exception as e:
-            # Captura a PacienteMenorDeIdadeException e exibe em formato de destaque
             mensagem_erro = f"\n======================================================\n❌ AGENDAMENTO RECUSADO (REGRAS DA CLÍNICA):\n{e}\n======================================================"
             self._tela_atendimento.mostra_mensagem(mensagem_erro)
 
@@ -71,9 +71,10 @@ class ControladorAtendimento:
 
         pacientes = self._controlador_sistema._controlador_paciente.pacientes
         profissionais = self._controlador_sistema._controlador_profissional.profissionais
+        tipos = self._controlador_sistema._controlador_tipo_atendimento.tipos
         
         self._tela_atendimento.mostra_mensagem("Insira os novos dados do atendimento:")
-        novos_dados = self._tela_atendimento.pega_dados_atendimento(pacientes, profissionais)
+        novos_dados = self._tela_atendimento.pega_dados_atendimento(pacientes, profissionais, tipos)
         if not novos_dados:
             return
             
