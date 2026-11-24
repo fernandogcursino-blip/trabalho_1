@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 class Pagamento(ABC):
+    @abstractmethod
     def __init__(self, data: str, atendimento, paciente, valor_pago: float):
         self._data = data
         self._atendimento = atendimento
